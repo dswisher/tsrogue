@@ -30,7 +30,7 @@ export default class Game {
         this._resizeCanvas();
 
         this._spriteSheet = new Image();
-        this._spriteSheet.src = 'assets/human.png';
+        this._spriteSheet.src = 'human.png';
 
         window.addEventListener('resize', this._resizeCanvas);
 
