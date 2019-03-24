@@ -1,0 +1,34 @@
+<!doctype html>
+<html>
+    <head>
+        <title>TS Rogue</title>
+        <style>
+            * {
+                margin: 0;
+                padding: 0;
+            }
+
+            body, html {
+                height: 100%;
+                background: #CCCCCC;
+            }
+
+            #canvas {
+                /*
+                width: 100%;
+                height: 100%;
+                */
+                position: absolute;
+                background: black;
+            }
+        </style>
+    </head>
+    <body>
+        <canvas id="canvas"></canvas>
+    </body>
+    <script src="dist/tsrogue.js"></script>
+    <script>
+        game = new tsrogue.Game('canvas');
+        game.run();
+    </script>
+</html>
