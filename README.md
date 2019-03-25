@@ -9,7 +9,9 @@ A Roguelike written using TypeScript (need a better name).
 * [webpack](https://webpack.js.org/) - [configuration](https://webpack.js.org/configuration) - [concepts](https://webpack.js.org/concepts)
 * [ROT.js](https://ondras.github.io/rot.js/hp/) - [github](https://github.com/ondras/rot.js)
 * Tiles: [reddit thread](https://www.reddit.com/r/roguelikedev/comments/436sop/roguelike_tilesets/) - [rltiles](https://github.com/statico/rltiles) - OGA [rogue-tag](https://opengameart.org/art-search-advanced?field_art_tags_tid=roguelike) - [dungeon crawl](https://opengameart.org/content/dungeon-crawl-32x32-tiles)
-* Canvas: [MDN](https://developer.mozilla.org/en-US/docs/Web/API/Canvas_API/)
+* Canvas: [MDN](https://developer.mozilla.org/en-US/docs/Web/API/Canvas_API/) - [CanvasRenderingContext2D](https://developer.mozilla.org/en-US/docs/Web/API/CanvasRenderingContext2Dhttps://developer.mozilla.org/en-US/docs/Web/API/CanvasRenderingContext2D)
+* FPS counter: [blog](https://www.growingwiththeweb.com/2017/12/fast-simple-js-fps-counter.html)
+* Python: [PNG module](https://github.com/drj11/pypng)
 * Roguelikedev [tutorial revised](https://www.reddit.com/r/roguelikedev/wiki/python_tutorial_series)
   * [part 1](http://rogueliketutorials.com/libtcod/1) - Drawing the '@' symbol and moving it around
   * [part 2](http://rogueliketutorials.com/libtcod/2) - The generic Entity, the render functions, and the map
