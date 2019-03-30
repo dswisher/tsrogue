@@ -1,126 +1,126 @@
 
-import Entity from './entity';
-import Position from './components/position';
-import Renderable from './components/renderable';
+import Position from "./components/position";
+import Renderable from "./components/renderable";
+import Entity from "./entity";
 
 export default class Game {
-    _ctx: CanvasRenderingContext2D;
-    _canvas: HTMLCanvasElement;
-    _running: boolean;
-    _debug: boolean;
-    _player_x: number;
-    _player_y: number;
-    _width: number;
-    _height: number;
-    _spriteHeight: number;
-    _spriteWidth: number;
-    _speed: number;
-    _spriteSheet: HTMLImageElement;
-    _timing: Array<number>;
+    public player: Entity;
 
-    player: Entity;
+    private ctx: CanvasRenderingContext2D;
+    private canvas: HTMLCanvasElement;
+    private running: boolean;
+    private debug: boolean;
+    private playerX: number;
+    private playerY: number;
+    private width: number;
+    private height: number;
+    private spriteHeight: number;
+    private spriteWidth: number;
+    private speed: number;
+    private spriteSheet: HTMLImageElement;
+    private timing: number[];
 
     constructor(canvasId: string) {
-        this._running = false;
-        this._player_x = 64;
-        this._player_y = 64;
+        this.running = false;
+        this.playerX = 64;
+        this.playerY = 64;
 
-        this._speed = 32;
+        this.speed = 32;
 
-        this._debug = false;
+        this.debug = false;
 
-        this._spriteHeight = 32;
-        this._spriteWidth = 32;
+        this.spriteHeight = 32;
+        this.spriteWidth = 32;
 
         this.player = new Entity();
         this.player.addComponent(new Position(64, 64)).addComponent(new Renderable());
 
-        this._canvas = <HTMLCanvasElement> document.getElementById(canvasId);
-        this._ctx = this._canvas.getContext("2d");
+        this.canvas = document.getElementById(canvasId) as HTMLCanvasElement;
+        this.ctx = this.canvas.getContext("2d");
 
-        this._resizeCanvas();
+        this.resizeCanvas();
 
-        this._spriteSheet = new Image();
-        this._spriteSheet.src = 'human.png';
+        this.spriteSheet = new Image();
+        this.spriteSheet.src = "human.png";
 
-        this._ctx.font = '15px serif';
-        this._timing = [];
+        this.ctx.font = "15px serif";
+        this.timing = [];
 
-        window.addEventListener('resize', this._resizeCanvas);
+        window.addEventListener("resize", this.resizeCanvas);
 
-        window.addEventListener("keydown", this._handleInput);
+        window.addEventListener("keydown", this.handleInput);
     }
 
-    run() {
-        this._running = true;
+    public run() {
+        this.running = true;
 
-        requestAnimationFrame(this._renderFrame);
+        requestAnimationFrame(this.renderFrame);
     }
 
-    _resizeCanvas = () => {
-        this._canvas.width = window.innerWidth;
-        this._canvas.height = window.innerHeight;
+    private resizeCanvas = () => {
+        this.canvas.width = window.innerWidth;
+        this.canvas.height = window.innerHeight;
 
-        this._width = this._canvas.width;
-        this._height = this._canvas.height;
+        this.width = this.canvas.width;
+        this.height = this.canvas.height;
     }
 
-    _handleInput = (event) => {
+    private handleInput = (event) => {
         switch (event.keyCode) {
             case 68:    // d - for now, toggle debug
-                this._debug = !this._debug;
+                this.debug = !this.debug;
                 break;
             case 72:    // h - move left
-                if (this._player_x >= this._speed) {
-                    this._player_x -= this._speed;
+                if (this.playerX >= this.speed) {
+                    this.playerX -= this.speed;
                 }
                 break;
             case 74:    // j - move down
-                if (this._player_y <= this._height - this._spriteHeight - this._speed) {
-                    this._player_y += this._speed;
+                if (this.playerY <= this.height - this.spriteHeight - this.speed) {
+                    this.playerY += this.speed;
                 }
                 break;
             case 75:    // k - move up
-                if (this._player_y >= this._speed) {
-                    this._player_y -= this._speed;
+                if (this.playerY >= this.speed) {
+                    this.playerY -= this.speed;
                 }
                 break;
             case 76:    // l - move right
-                if (this._player_x <= this._width - this._spriteWidth - this._speed) {
-                    this._player_x += this._speed;
+                if (this.playerX <= this.width - this.spriteWidth - this.speed) {
+                    this.playerX += this.speed;
                 }
                 break;
         }
     }
 
-    _renderFrame = () => {
+    private renderFrame = () => {
         // A fresh start
-        this._ctx.clearRect(0, 0, this._width, this._height);
+        this.ctx.clearRect(0, 0, this.width, this.height);
 
         // Draw some debug bits
-        if (this._debug) {
-            this._ctx.strokeStyle = 'green';
-            this._ctx.fillStyle = 'green';
-            this._ctx.strokeRect(this._player_x, this._player_y, this._spriteWidth, this._spriteHeight);
+        if (this.debug) {
+            this.ctx.strokeStyle = "green";
+            this.ctx.fillStyle = "green";
+            this.ctx.strokeRect(this.playerX, this.playerY, this.spriteWidth, this.spriteHeight);
 
             const now = performance.now();
-            while (this._timing.length > 0 && this._timing[0] <= now - 1000) {
-                this._timing.shift();
+            while (this.timing.length > 0 && this.timing[0] <= now - 1000) {
+                this.timing.shift();
             }
-            this._timing.push(now);
-            this._ctx.fillText("FPS: " + this._timing.length, this._width - 60, 20);
+            this.timing.push(now);
+            this.ctx.fillText("FPS: " + this.timing.length, this.width - 60, 20);
         }
 
         // Draw everything
-        var sx = 0;     // position of the sprite within the sprite sheet
-        var sy = 0;
+        const sx = 0;     // position of the sprite within the sprite sheet
+        const sy = 0;
 
-        this._ctx.drawImage(this._spriteSheet, sx, sy, this._spriteWidth, this._spriteHeight, this._player_x, this._player_y, this._spriteWidth, this._spriteHeight);
+        this.ctx.drawImage(this.spriteSheet, sx, sy, this.spriteWidth, this.spriteHeight,
+                           this.playerX, this.playerY, this.spriteWidth, this.spriteHeight);
 
         // Keep the loop going
-        if (this._running) {
-            requestAnimationFrame(this._renderFrame);
+        if (this.running) {
+            requestAnimationFrame(this.renderFrame);
         }
     }
 }
-

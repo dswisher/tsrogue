@@ -3,8 +3,7 @@ import Component from "./component";
 
 export default class Renderable implements Component {
 
-    getName() {
+    public getName() {
         return "renderable";
     }
 }
-

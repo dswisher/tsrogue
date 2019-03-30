@@ -3,16 +3,15 @@ import Component from "./component";
 
 export default class Position implements Component {
 
-    _x: number;
-    _y: number;
+    private x: number;
+    private y: number;
 
     constructor(x: number, y: number) {
-        this._x = x;
-        this._y = y;
+        this.x = x;
+        this.y = y;
     }
 
-    getName() {
+    public getName() {
         return "position";
     }
 }
-

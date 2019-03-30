@@ -14,7 +14,21 @@ module.exports = {
         rules: [
             {
                 test: /\.ts$/,
-                use: 'ts-loader',
+                enforce: 'pre',
+                use: [
+                    {
+                        loader: 'tslint-loader',
+                        options: {
+                            failOnHint: true
+                        }
+                    }
+                ]
+            },
+            {
+                test: /\.ts$/,
+                use: {
+                    loader: 'ts-loader'
+                },
                 exclude: /node_modules/
             }
         ]
