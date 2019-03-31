@@ -7,7 +7,10 @@ module.exports = {
     devServer: {
         contentBase: path.join(__dirname, 'dist'),
         compress: false,
-        port: 9000
+        port: 9000,
+        watchOptions: {
+            ignored: /node_modules/
+        }
     },
     entry: './src/index.ts',
     module: {
@@ -33,6 +36,9 @@ module.exports = {
             }
         ]
     },
+    performance: {
+        maxAssetSize: 726875
+    },
     resolve: {
         extensions: [ '.ts', '.js' ]
     },
@@ -51,6 +57,8 @@ module.exports = {
     plugins: [
         new CopyPlugin([
             { from: './index.html' },
+            { from: './assets/rltiles-2d.json' },
+            { from: './assets/rltiles-2d.png' },
             { from: './assets/human.png' },
             { from: './assets/favicon.ico' }
         ])

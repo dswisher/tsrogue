@@ -15,11 +15,8 @@ $(DIST): $(TS_SRC) $(DEPS) index.html
 serve: $(DIST)
 	$(WEBPACK_DEV)
 
-watch: clean $(DIST)
-	$(WEBPACK) --watch
-
 clean:
 	rm -rf dist
 
-.PHONY: clean serve watch
+.PHONY: clean serve 
 

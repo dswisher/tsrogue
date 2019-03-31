@@ -2,6 +2,7 @@
 import Position from "./components/position";
 import Renderable from "./components/renderable";
 import Entity from "./entity";
+import { SpriteSheet } from "./SpriteSheet";
 
 export default class Game {
     public player: Entity;
@@ -17,7 +18,7 @@ export default class Game {
     private spriteHeight: number;
     private spriteWidth: number;
     private speed: number;
-    private spriteSheet: HTMLImageElement;
+    private spriteSheet: SpriteSheet;
     private timing: number[];
 
     constructor(canvasId: string) {
@@ -40,21 +41,51 @@ export default class Game {
 
         this.resizeCanvas();
 
-        this.spriteSheet = new Image();
-        this.spriteSheet.src = "human.png";
-
         this.ctx.font = "15px serif";
         this.timing = [];
-
-        window.addEventListener("resize", this.resizeCanvas);
-
-        window.addEventListener("keydown", this.handleInput);
     }
 
     public run() {
-        this.running = true;
+        this.loadJSON("rltiles-2d.json", (data) => {
+            this.loadImage("rltiles-2d.png", (image) => {
+                this.running = true;
 
-        requestAnimationFrame(this.renderFrame);
+                this.spriteSheet = new SpriteSheet(this.ctx, data, image);
+
+                window.addEventListener("resize", this.resizeCanvas);
+                window.addEventListener("keydown", this.handleInput);
+
+                requestAnimationFrame(this.renderFrame);
+            });
+        });
+
+    }
+
+    private loadImage(filename: string, callback: (image: HTMLImageElement) => void) {
+        console.log("...loading sprite image...");
+
+        const image = new Image();
+        image.onload = () => {
+            callback(image);
+        };
+
+        image.src = filename;
+    }
+
+    private loadJSON(filename: string, callback: (response: any) => void) {
+        console.log("...loading JSON...");
+
+        const xobj = new XMLHttpRequest();
+        xobj.overrideMimeType("application/json");
+        xobj.open("GET", filename, true);
+        xobj.onreadystatechange = () => {
+          if (xobj.readyState === 4 && xobj.status === 200) {
+            // Required use of an anonymous callback as .open will NOT return a value but simply returns
+            //  undefined in asynchronous mode
+            callback(JSON.parse(xobj.responseText));
+          }
+        };
+        xobj.send(null);
     }
 
     private resizeCanvas = () => {
@@ -112,11 +143,7 @@ export default class Game {
         }
 
         // Draw everything
-        const sx = 0;     // position of the sprite within the sprite sheet
-        const sy = 0;
-
-        this.ctx.drawImage(this.spriteSheet, sx, sy, this.spriteWidth, this.spriteHeight,
-                           this.playerX, this.playerY, this.spriteWidth, this.spriteHeight);
+        this.spriteSheet.getSpriteByName("sigmund").draw(this.playerX, this.playerY);
 
         // Keep the loop going
         if (this.running) {
