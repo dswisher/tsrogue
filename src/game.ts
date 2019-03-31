@@ -4,9 +4,9 @@ import { Entity } from "./ecs/Entity";
 import { EntityManager } from "./ecs/EntityManager";
 import { PositionComponent } from "./ecs/PositionComponent";
 import { RenderableComponent } from "./ecs/RenderableComponent";
-import { SpriteSheet } from "./SpriteSheet";
 import { GameScreen } from "./ui/GameScreen";
 import { ScreenManager } from "./ui/ScreenManager";
+import { SpriteSheet } from "./ui/SpriteSheet";
 import { Rect } from "./util/Rect";
 
 export class Game {
@@ -14,16 +14,11 @@ export class Game {
     private ctx: CanvasRenderingContext2D;
     private canvas: HTMLCanvasElement;
     private running: boolean;
-    private debug: boolean;
-    private canvasWidth: number;    // the width of the canvas, in pixels
-    private canvasHeight: number;   // the height of the canvas, in pixels
     private width: number;          // the width of the play area, in cells
     private height: number;         // the height of the play area, in cells
     private spriteHeight: number;
     private spriteWidth: number;
-    private speed: number;
     private spriteSheet: SpriteSheet;
-    private timing: number[];
 
     private map: DungeonMap;
     private screenManager: ScreenManager;
@@ -33,10 +28,6 @@ export class Game {
 
     constructor(canvasId: string) {
         this.running = false;
-
-        this.speed = 1;
-
-        this.debug = false;
 
         this.spriteHeight = 32;
         this.spriteWidth = 32;
@@ -59,7 +50,6 @@ export class Game {
         this.resizeCanvas();
 
         this.ctx.font = "15px serif";
-        this.timing = [];
     }
 
     public run() {
@@ -115,10 +105,6 @@ export class Game {
         this.canvas.width = bounds.width;
         this.canvas.height = bounds.height;
 
-        // TODO - change canvasWidth and canvasHeight to a Dimension object?
-        this.canvasWidth = this.canvas.width;
-        this.canvasHeight = this.canvas.height;
-
         this.screenManager.setBounds(bounds);
     }
 
@@ -133,27 +119,24 @@ export class Game {
     private handleInput = (event) => {
         switch (event.keyCode) {
             case 68:    // d - for now, toggle debug
-                this.debug = !this.debug;
+                this.screenManager.debug = !this.screenManager.debug;
                 break;
             case 72:    // h - move left
-                this.movePlayerTo(this.playerPosition.x - this.speed, this.playerPosition.y);
+                this.movePlayerTo(this.playerPosition.x - 1, this.playerPosition.y);
                 break;
             case 74:    // j - move down
-                this.movePlayerTo(this.playerPosition.x, this.playerPosition.y + this.speed);
+                this.movePlayerTo(this.playerPosition.x, this.playerPosition.y + 1);
                 break;
             case 75:    // k - move up
-                this.movePlayerTo(this.playerPosition.x, this.playerPosition.y - this.speed);
+                this.movePlayerTo(this.playerPosition.x, this.playerPosition.y - 1);
                 break;
             case 76:    // l - move right
-                this.movePlayerTo(this.playerPosition.x + this.speed, this.playerPosition.y);
+                this.movePlayerTo(this.playerPosition.x + 1, this.playerPosition.y);
                 break;
         }
     }
 
     private renderFrame = () => {
-        // A fresh start
-        this.ctx.clearRect(0, 0, this.canvasWidth, this.canvasHeight);
-
         // Draw everything
         this.screenManager.draw(this.ctx);
 
@@ -169,27 +152,6 @@ export class Game {
                     }
                 }
             }
-        }
-
-        // Draw a debug overlay, if requested
-        if (this.debug) {
-            this.ctx.strokeStyle = "blue";
-            this.ctx.strokeRect(0, 0, this.width * this.spriteWidth, this.height * this.spriteHeight);
-
-            this.ctx.strokeStyle = "green";
-            this.ctx.fillStyle = "green";
-            this.ctx.strokeRect(this.playerPosition.x * this.spriteWidth,
-                                this.playerPosition.y * this.spriteHeight,
-                                this.spriteWidth, this.spriteHeight);
-
-            this.ctx.fillText("x: " + this.playerPosition.x + " y: " + this.playerPosition.y, 10, 20);
-
-            const now = performance.now();
-            while (this.timing.length > 0 && this.timing[0] <= now - 1000) {
-                this.timing.shift();
-            }
-            this.timing.push(now);
-            this.ctx.fillText("FPS: " + this.timing.length, this.canvasWidth - 60, 20);
         }
 
         // Keep the loop going

@@ -1,5 +1,5 @@
 
-import { Sprite } from "../Sprite";
+import { Sprite } from "../ui/Sprite";
 import { Component } from "./Component";
 
 export class RenderableComponent extends Component {
