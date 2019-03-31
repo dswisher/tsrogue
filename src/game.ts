@@ -1,6 +1,7 @@
 
 import Position from "./components/position";
 import Renderable from "./components/renderable";
+import { DungeonMap } from "./DungeonMap";
 import Entity from "./entity";
 import { SpriteSheet } from "./SpriteSheet";
 
@@ -13,25 +14,34 @@ export default class Game {
     private debug: boolean;
     private playerX: number;
     private playerY: number;
-    private width: number;
-    private height: number;
+    private canvasWidth: number;    // the width of the canvas, in pixels
+    private canvasHeight: number;   // the height of the canvas, in pixels
+    private width: number;          // the width of the play area, in cells
+    private height: number;         // the height of the play area, in cells
     private spriteHeight: number;
     private spriteWidth: number;
     private speed: number;
     private spriteSheet: SpriteSheet;
     private timing: number[];
 
+    private map: DungeonMap;
+
     constructor(canvasId: string) {
         this.running = false;
-        this.playerX = 64;
-        this.playerY = 64;
+        this.playerX = 2;
+        this.playerY = 2;
 
-        this.speed = 32;
+        this.speed = 1;
 
         this.debug = false;
 
         this.spriteHeight = 32;
         this.spriteWidth = 32;
+
+        // TODO - use a factory to generate the map (or at least to populate it)
+        this.width = 30;
+        this.height = 20;
+        this.map = new DungeonMap(this.width, this.height);
 
         this.player = new Entity();
         this.player.addComponent(new Position(64, 64)).addComponent(new Renderable());
@@ -92,8 +102,16 @@ export default class Game {
         this.canvas.width = window.innerWidth;
         this.canvas.height = window.innerHeight;
 
-        this.width = this.canvas.width;
-        this.height = this.canvas.height;
+        this.canvasWidth = this.canvas.width;
+        this.canvasHeight = this.canvas.height;
+    }
+
+    private movePlayerTo(x: number, y: number) {
+        const tile = this.map.getTile(x, y);
+        if (!tile.isBlocked()) {
+            this.playerX = x;
+            this.playerY = y;
+        }
     }
 
     private handleInput = (event) => {
@@ -102,48 +120,61 @@ export default class Game {
                 this.debug = !this.debug;
                 break;
             case 72:    // h - move left
-                if (this.playerX >= this.speed) {
-                    this.playerX -= this.speed;
-                }
+                this.movePlayerTo(this.playerX - this.speed, this.playerY);
                 break;
             case 74:    // j - move down
-                if (this.playerY <= this.height - this.spriteHeight - this.speed) {
-                    this.playerY += this.speed;
-                }
+                this.movePlayerTo(this.playerX, this.playerY + this.speed);
                 break;
             case 75:    // k - move up
-                if (this.playerY >= this.speed) {
-                    this.playerY -= this.speed;
-                }
+                this.movePlayerTo(this.playerX, this.playerY - this.speed);
                 break;
             case 76:    // l - move right
-                if (this.playerX <= this.width - this.spriteWidth - this.speed) {
-                    this.playerX += this.speed;
-                }
+                this.movePlayerTo(this.playerX + this.speed, this.playerY);
                 break;
         }
     }
 
     private renderFrame = () => {
         // A fresh start
-        this.ctx.clearRect(0, 0, this.width, this.height);
+        this.ctx.clearRect(0, 0, this.canvasWidth, this.canvasHeight);
 
-        // Draw some debug bits
+        // Draw everything
+        const wall = this.spriteSheet.getSpriteByName("dngn_rock_wall_08");
+        for (let x: number = 0; x < this.width; x++) {
+            for (let y: number = 0; y < this.height; y++) {
+                const tile = this.map.getTile(x, y);
+                if (tile === undefined) {
+                    console.log("-> tile is undefined, x=%d, y=%d", x, y);
+                } else {
+                    if (tile.isBlocked()) {
+                        wall.draw(x * this.spriteWidth, y * this.spriteHeight);
+                    }
+                }
+            }
+        }
+
+        this.spriteSheet.getSpriteByName("sigmund")
+            .draw(this.playerX * this.spriteWidth, this.playerY * this.spriteHeight);
+
+        // Draw a debug overlay, if requested
         if (this.debug) {
+            this.ctx.strokeStyle = "blue";
+            this.ctx.strokeRect(0, 0, this.width * this.spriteWidth, this.height * this.spriteHeight);
+
             this.ctx.strokeStyle = "green";
             this.ctx.fillStyle = "green";
-            this.ctx.strokeRect(this.playerX, this.playerY, this.spriteWidth, this.spriteHeight);
+            this.ctx.strokeRect(this.playerX * this.spriteWidth, this.playerY * this.spriteHeight,
+                                this.spriteWidth, this.spriteHeight);
+
+            this.ctx.fillText("x: " + this.playerX + " y: " + this.playerY, 10, 20);
 
             const now = performance.now();
             while (this.timing.length > 0 && this.timing[0] <= now - 1000) {
                 this.timing.shift();
             }
             this.timing.push(now);
-            this.ctx.fillText("FPS: " + this.timing.length, this.width - 60, 20);
+            this.ctx.fillText("FPS: " + this.timing.length, this.canvasWidth - 60, 20);
         }
-
-        // Draw everything
-        this.spriteSheet.getSpriteByName("sigmund").draw(this.playerX, this.playerY);
 
         // Keep the loop going
         if (this.running) {
