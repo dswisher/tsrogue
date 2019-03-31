@@ -3,7 +3,7 @@
         "module": "ES6",
         "outDir": "./dist/",
         "sourceMap": true,
-        "target": "ES5"
+        "target": "ES6"
     },
     "include": [
         "src/**/*"

@@ -6,6 +6,7 @@ A Roguelike written using TypeScript (need a better name).
 
 * TypeScript documentation generation: [tsdoc](https://github.com/Microsoft/tsdoc) proposed standard - [typedoc](https://github.com/TypeStrong/typedoc) generator (MSFT)
 * TypeScript linting: blog: [to lint or not](https://pawelgrzybek.com/linting-typescript/) - [tslint](https://palantir.github.io/tslint/) - [tslint-loader](https://www.npmjs.com/package/tslint-loader) for webpack
+* ECS implementations: [Esper](https://github.com/benmoran56/esper) (Python)
 * [ECS in Javascript](http://vasir.net/blog/game-development/how-to-build-entity-component-system-in-javascript) (Rectangle Eater)
 * [TypeScript](https://www.typescriptlang.org/index.html) - [compiler options](https://www.typescriptlang.org/docs/handbook/compiler-options.html)
 * [webpack](https://webpack.js.org/) - [configuration](https://webpack.js.org/configuration) - [concepts](https://webpack.js.org/concepts)

@@ -1,5 +1,6 @@
 
-export {default as RNG} from "./rng";
-export {default as Game} from "./game";
-export {default as Entity} from "./entity";
-export {default as Components} from "./components/index";
+export { Game } from "./game";
+
+// TODO - temporarily expose these for debugging
+export { PositionComponent } from "./ecs/PositionComponent";
+export { RenderableComponent } from "./ecs/RenderableComponent";

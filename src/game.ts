@@ -1,19 +1,20 @@
 
-import Position from "./components/position";
-import Renderable from "./components/renderable";
 import { DungeonMap } from "./DungeonMap";
-import Entity from "./entity";
+import { Entity } from "./ecs/Entity";
+import { EntityManager } from "./ecs/EntityManager";
+import { PositionComponent } from "./ecs/PositionComponent";
+import { RenderableComponent } from "./ecs/RenderableComponent";
 import { SpriteSheet } from "./SpriteSheet";
+import { GameScreen } from "./ui/GameScreen";
+import { ScreenManager } from "./ui/ScreenManager";
+import { Rect } from "./util/Rect";
 
-export default class Game {
-    public player: Entity;
+export class Game {
 
     private ctx: CanvasRenderingContext2D;
     private canvas: HTMLCanvasElement;
     private running: boolean;
     private debug: boolean;
-    private playerX: number;
-    private playerY: number;
     private canvasWidth: number;    // the width of the canvas, in pixels
     private canvasHeight: number;   // the height of the canvas, in pixels
     private width: number;          // the width of the play area, in cells
@@ -25,11 +26,13 @@ export default class Game {
     private timing: number[];
 
     private map: DungeonMap;
+    private screenManager: ScreenManager;
+    private entityManager: EntityManager;
+    private player: Entity;
+    private playerPosition: PositionComponent;
 
     constructor(canvasId: string) {
         this.running = false;
-        this.playerX = 2;
-        this.playerY = 2;
 
         this.speed = 1;
 
@@ -43,11 +46,15 @@ export default class Game {
         this.height = 20;
         this.map = new DungeonMap(this.width, this.height);
 
-        this.player = new Entity();
-        this.player.addComponent(new Position(64, 64)).addComponent(new Renderable());
-
         this.canvas = document.getElementById(canvasId) as HTMLCanvasElement;
         this.ctx = this.canvas.getContext("2d");
+
+        this.entityManager = new EntityManager();
+        this.playerPosition = new PositionComponent(2, 2);
+
+        this.screenManager = new ScreenManager();
+        const gameScreen = new GameScreen(this.entityManager);
+        this.screenManager.push(gameScreen);
 
         this.resizeCanvas();
 
@@ -61,6 +68,10 @@ export default class Game {
                 this.running = true;
 
                 this.spriteSheet = new SpriteSheet(this.ctx, data, image);
+
+                this.player = this.entityManager.createEntity()
+                                .addComponent(this.playerPosition)
+                                .addComponent(new RenderableComponent(this.spriteSheet.getSpriteByName("sigmund")));
 
                 window.addEventListener("resize", this.resizeCanvas);
                 window.addEventListener("keydown", this.handleInput);
@@ -99,18 +110,23 @@ export default class Game {
     }
 
     private resizeCanvas = () => {
-        this.canvas.width = window.innerWidth;
-        this.canvas.height = window.innerHeight;
+        const bounds = new Rect(0, 0, window.innerWidth, window.innerHeight);
 
+        this.canvas.width = bounds.width;
+        this.canvas.height = bounds.height;
+
+        // TODO - change canvasWidth and canvasHeight to a Dimension object?
         this.canvasWidth = this.canvas.width;
         this.canvasHeight = this.canvas.height;
+
+        this.screenManager.setBounds(bounds);
     }
 
     private movePlayerTo(x: number, y: number) {
         const tile = this.map.getTile(x, y);
         if (!tile.isBlocked()) {
-            this.playerX = x;
-            this.playerY = y;
+            this.playerPosition.x = x;
+            this.playerPosition.y = y;
         }
     }
 
@@ -120,16 +136,16 @@ export default class Game {
                 this.debug = !this.debug;
                 break;
             case 72:    // h - move left
-                this.movePlayerTo(this.playerX - this.speed, this.playerY);
+                this.movePlayerTo(this.playerPosition.x - this.speed, this.playerPosition.y);
                 break;
             case 74:    // j - move down
-                this.movePlayerTo(this.playerX, this.playerY + this.speed);
+                this.movePlayerTo(this.playerPosition.x, this.playerPosition.y + this.speed);
                 break;
             case 75:    // k - move up
-                this.movePlayerTo(this.playerX, this.playerY - this.speed);
+                this.movePlayerTo(this.playerPosition.x, this.playerPosition.y - this.speed);
                 break;
             case 76:    // l - move right
-                this.movePlayerTo(this.playerX + this.speed, this.playerY);
+                this.movePlayerTo(this.playerPosition.x + this.speed, this.playerPosition.y);
                 break;
         }
     }
@@ -139,6 +155,8 @@ export default class Game {
         this.ctx.clearRect(0, 0, this.canvasWidth, this.canvasHeight);
 
         // Draw everything
+        this.screenManager.draw(this.ctx);
+
         const wall = this.spriteSheet.getSpriteByName("dngn_rock_wall_08");
         for (let x: number = 0; x < this.width; x++) {
             for (let y: number = 0; y < this.height; y++) {
@@ -153,9 +171,6 @@ export default class Game {
             }
         }
 
-        this.spriteSheet.getSpriteByName("sigmund")
-            .draw(this.playerX * this.spriteWidth, this.playerY * this.spriteHeight);
-
         // Draw a debug overlay, if requested
         if (this.debug) {
             this.ctx.strokeStyle = "blue";
@@ -163,10 +178,11 @@ export default class Game {
 
             this.ctx.strokeStyle = "green";
             this.ctx.fillStyle = "green";
-            this.ctx.strokeRect(this.playerX * this.spriteWidth, this.playerY * this.spriteHeight,
+            this.ctx.strokeRect(this.playerPosition.x * this.spriteWidth,
+                                this.playerPosition.y * this.spriteHeight,
                                 this.spriteWidth, this.spriteHeight);
 
-            this.ctx.fillText("x: " + this.playerX + " y: " + this.playerY, 10, 20);
+            this.ctx.fillText("x: " + this.playerPosition.x + " y: " + this.playerPosition.y, 10, 20);
 
             const now = performance.now();
             while (this.timing.length > 0 && this.timing[0] <= now - 1000) {
