@@ -14,11 +14,6 @@ export class Game {
     private ctx: CanvasRenderingContext2D;
     private canvas: HTMLCanvasElement;
     private running: boolean;
-    private width: number;          // the width of the play area, in cells
-    private height: number;         // the height of the play area, in cells
-    private spriteHeight: number;
-    private spriteWidth: number;
-    private spriteSheet: SpriteSheet;
 
     private map: DungeonMap;
     private screenManager: ScreenManager;
@@ -29,25 +24,14 @@ export class Game {
     constructor(canvasId: string) {
         this.running = false;
 
-        this.spriteHeight = 32;
-        this.spriteWidth = 32;
-
-        // TODO - use a factory to generate the map (or at least to populate it)
-        this.width = 40;
-        this.height = 20;
-        this.map = new DungeonMap(this.width, this.height);
+        // TODO - use a factory to generate the map (or at least to populate it), so we can have different algos
+        this.map = new DungeonMap(40, 20);
 
         this.canvas = document.getElementById(canvasId) as HTMLCanvasElement;
         this.ctx = this.canvas.getContext("2d");
 
         this.entityManager = new EntityManager();
         this.playerPosition = new PositionComponent(this.map.start.x, this.map.start.y);
-
-        this.screenManager = new ScreenManager();
-        const gameScreen = new GameScreen(this.entityManager);
-        this.screenManager.push(gameScreen);
-
-        this.resizeCanvas();
 
         this.ctx.font = "15px serif";
     }
@@ -57,11 +41,17 @@ export class Game {
             this.loadImage("rltiles-2d.png", (image) => {
                 this.running = true;
 
-                this.spriteSheet = new SpriteSheet(this.ctx, data, image);
+                const spriteSheet = new SpriteSheet(this.ctx, data, image);
+
+                this.screenManager = new ScreenManager();
+                const gameScreen = new GameScreen(this.entityManager, this.map, spriteSheet);
+                this.screenManager.push(gameScreen);
+
+                this.resizeCanvas();
 
                 this.player = this.entityManager.createEntity()
                                 .addComponent(this.playerPosition)
-                                .addComponent(new RenderableComponent(this.spriteSheet.getSpriteByName("sigmund")));
+                                .addComponent(new RenderableComponent(spriteSheet.getSpriteByName("sigmund")));
 
                 window.addEventListener("resize", this.resizeCanvas);
                 window.addEventListener("keydown", this.handleInput);
@@ -139,21 +129,6 @@ export class Game {
     private renderFrame = () => {
         // Draw everything
         this.screenManager.draw(this.ctx);
-
-        // TODO - move this to map widget!
-        const wall = this.spriteSheet.getSpriteByName("dngn_rock_wall_08");
-        for (let x: number = 0; x < this.width; x++) {
-            for (let y: number = 0; y < this.height; y++) {
-                const tile = this.map.getTile(x, y);
-                if (tile === undefined) {
-                    console.log("-> tile is undefined, x=%d, y=%d", x, y);
-                } else {
-                    if (tile.blocksMovement) {
-                        wall.draw(x * this.spriteWidth, y * this.spriteHeight);
-                    }
-                }
-            }
-        }
 
         // Keep the loop going
         if (this.running) {

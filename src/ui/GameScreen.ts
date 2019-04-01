@@ -1,14 +1,16 @@
 
+import { DungeonMap } from "../DungeonMap";
 import { EntityManager } from "../ecs/EntityManager";
-import { MapWidget } from "./MapWidget.ts";
-import { Screen } from "./Screen.ts";
+import { SpriteSheet } from "../ui/SpriteSheet";
+import { MapWidget } from "./MapWidget";
+import { Screen } from "./Screen";
 
 export class GameScreen extends Screen {
     private mapWidget: MapWidget;
 
-    constructor(entityManager: EntityManager) {
+    constructor(entityManager: EntityManager, map: DungeonMap, spriteSheet: SpriteSheet) {
         super();
 
-        this.addWidget(new MapWidget(entityManager));
+        this.addWidget(new MapWidget(entityManager, map, spriteSheet));
     }
 }

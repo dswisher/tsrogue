@@ -35,6 +35,14 @@ export class DungeonMap {
         return this._start;
     }
 
+    get width() {
+        return this._width;
+    }
+
+    get height() {
+        return this._height;
+    }
+
     private makeMap() {
         const minRoomSize = 6;
         const maxRoomSize = 10;
