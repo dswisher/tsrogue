@@ -33,7 +33,7 @@ export class Game {
         this.spriteWidth = 32;
 
         // TODO - use a factory to generate the map (or at least to populate it)
-        this.width = 30;
+        this.width = 40;
         this.height = 20;
         this.map = new DungeonMap(this.width, this.height);
 
@@ -41,7 +41,7 @@ export class Game {
         this.ctx = this.canvas.getContext("2d");
 
         this.entityManager = new EntityManager();
-        this.playerPosition = new PositionComponent(2, 2);
+        this.playerPosition = new PositionComponent(this.map.start.x, this.map.start.y);
 
         this.screenManager = new ScreenManager();
         const gameScreen = new GameScreen(this.entityManager);
@@ -110,7 +110,7 @@ export class Game {
 
     private movePlayerTo(x: number, y: number) {
         const tile = this.map.getTile(x, y);
-        if (!tile.isBlocked()) {
+        if (!tile.blocksMovement) {
             this.playerPosition.x = x;
             this.playerPosition.y = y;
         }
@@ -140,6 +140,7 @@ export class Game {
         // Draw everything
         this.screenManager.draw(this.ctx);
 
+        // TODO - move this to map widget!
         const wall = this.spriteSheet.getSpriteByName("dngn_rock_wall_08");
         for (let x: number = 0; x < this.width; x++) {
             for (let y: number = 0; y < this.height; y++) {
@@ -147,7 +148,7 @@ export class Game {
                 if (tile === undefined) {
                     console.log("-> tile is undefined, x=%d, y=%d", x, y);
                 } else {
-                    if (tile.isBlocked()) {
+                    if (tile.blocksMovement) {
                         wall.draw(x * this.spriteWidth, y * this.spriteHeight);
                     }
                 }

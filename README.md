@@ -15,20 +15,20 @@ A Roguelike written using TypeScript (need a better name).
 * Canvas: [MDN](https://developer.mozilla.org/en-US/docs/Web/API/Canvas_API/) - [CanvasRenderingContext2D](https://developer.mozilla.org/en-US/docs/Web/API/CanvasRenderingContext2Dhttps://developer.mozilla.org/en-US/docs/Web/API/CanvasRenderingContext2D)
 * FPS counter: [blog](https://www.growingwiththeweb.com/2017/12/fast-simple-js-fps-counter.html)
 * Python: [PNG module](https://github.com/drj11/pypng)
-* Roguelikedev [tutorial revised](https://www.reddit.com/r/roguelikedev/wiki/python_tutorial_series)
-  * [part 1](http://rogueliketutorials.com/libtcod/1) - Drawing the '@' symbol and moving it around
-  * [part 2](http://rogueliketutorials.com/libtcod/2) - The generic Entity, the render functions, and the map
-  * [part 3](http://rogueliketutorials.com/libtcod/3) - Generating a dungeon
-  * [part 4](http://rogueliketutorials.com/libtcod/4) - Field of View
-  * [part 5](http://rogueliketutorials.com/libtcod/5) - Placing Enemies and kicking them (harmlessly)
-  * [part 6](http://rogueliketutorials.com/libtcod/6) - Doing (and taking) some damage
-  * [part 7](http://rogueliketutorials.com/libtcod/7) - Creating the Interface
-  * [part 8](http://rogueliketutorials.com/libtcod/8) - Items and Inventory
-  * [part 9](http://rogueliketutorials.com/libtcod/9) - Ranged Scrolls and Targeting
-  * [part 10](http://rogueliketutorials.com/libtcod/10) - Saving and Loading
-  * [part 11](http://rogueliketutorials.com/libtcod/11) - Multiple floors
-  * [part 12](http://rogueliketutorials.com/libtcod/12) - Tuning the difficulty
-  * [part 13](http://rogueliketutorials.com/libtcod/13) - Equipment
+* Roguelikedev [tutorial revised](https://www.reddit.com/r/roguelikedev/wiki/python_tutorial_series) - [index](http://rogueliketutorials.com/tutorials/tcod/)
+  * [part 1](http://rogueliketutorials.com/tutorials/tcod/part-1) - Drawing the '@' symbol and moving it around
+  * [part 2](http://rogueliketutorials.com/tutorials/tcod/part-2) - The generic Entity, the render functions, and the map
+  * [part 3](http://rogueliketutorials.com/tutorials/tcod/part-3) - Generating a dungeon
+  * [part 4](http://rogueliketutorials.com/tutorials/tcod/part-4) - Field of View
+  * [part 5](http://rogueliketutorials.com/tutorials/tcod/part-5) - Placing Enemies and kicking them (harmlessly)
+  * [part 6](http://rogueliketutorials.com/tutorials/tcod/part-6) - Doing (and taking) some damage
+  * [part 7](http://rogueliketutorials.com/tutorials/tcod/part-7) - Creating the Interface
+  * [part 8](http://rogueliketutorials.com/tutorials/tcod/part-8) - Items and Inventory
+  * [part 9](http://rogueliketutorials.com/tutorials/tcod/part-9) - Ranged Scrolls and Targeting
+  * [part 10](http://rogueliketutorials.com/tutorials/tcod/part-10) - Saving and Loading
+  * [part 11](http://rogueliketutorials.com/tutorials/tcod/part-11) - Multiple floors
+  * [part 12](http://rogueliketutorials.com/tutorials/tcod/part-12) - Tuning the difficulty
+  * [part 13](http://rogueliketutorials.com/tutorials/tcod/part-13) - Equipment
   * repos: [official](https://github.com/TStand90/roguelike_tutorial_revised/tree/part1)
     * [JackBister](https://github.com/JackBister/ts-roguelike) - typescript + ROT.js
 

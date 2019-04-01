@@ -3,12 +3,20 @@
 
 const FRAC = 2.3283064365386963e-10; /* 2^-32 */
 
-class RNG {
+export class Random {
     private seed = 0;
     private s0 = 0;
     private s1 = 0;
     private s2 = 0;
     private c = 0;
+
+    constructor(seed: number = null) {
+        if (seed === null) {
+            seed = Date.now();
+        }
+
+        this.setSeed(seed);
+    }
 
     /**
      * Seed the number generator
@@ -44,6 +52,15 @@ class RNG {
         this.s2 = t - this.c;
         return this.s2;
     }
-}
 
-export default new RNG().setSeed(Date.now());
+    /**
+     * @param lowerBound The lower end of the range to return a value from, inclusive
+     * @param upperBound The upper end of the range to return a value from, inclusive
+     * @returns Pseudorandom value [lowerBound, upperBound], using Random.getUniform() to distribute the value
+     */
+    public getUniformInt(lowerBound: number, upperBound: number) {
+        const max = Math.max(lowerBound, upperBound);
+        const min = Math.min(lowerBound, upperBound);
+        return Math.floor(this.getUniform() * (max - min + 1)) + min;
+    }
+}
