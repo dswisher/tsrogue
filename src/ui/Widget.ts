@@ -2,13 +2,22 @@
 import { Rect } from "../util/Rect";
 
 export abstract class Widget {
-    private bounds: Rect;
+    protected bounds: Rect;
+    private _debug: boolean;
 
     public setBounds(bounds: Rect) {
         this.bounds = bounds;
     }
 
     public abstract draw(ctx: CanvasRenderingContext2D): void;
+
+    get debug(): boolean {
+        return this._debug;
+    }
+
+    set debug(val: boolean) {
+        this._debug = val;
+    }
 
     protected drawBounds(ctx: CanvasRenderingContext2D): void {
         ctx.strokeStyle = "red";

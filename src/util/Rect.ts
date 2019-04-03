@@ -56,4 +56,11 @@ export class Rect {
         return this.left <= other.right && this.right >= other.left &&
                this.top <= other.bottom && this.bottom >= other.top;
     }
+
+    public clip(bounds: Rect): Rect {
+        return new Rect(Math.max(this.left, bounds.left),
+                        Math.max(this.top, bounds.top),
+                        Math.min(this.right, bounds.right),
+                        Math.min(this.bottom, bounds.bottom));
+    }
 }

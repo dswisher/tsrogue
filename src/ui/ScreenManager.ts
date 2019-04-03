@@ -57,5 +57,8 @@ export class ScreenManager {
 
     set debug(val: boolean) {
         this._debug = val;
+        for (const screen of this.screens) {
+            screen.debug = this._debug;
+        }
     }
 }

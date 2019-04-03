@@ -20,18 +20,15 @@ export class Game {
     private entityManager: EntityManager;
     private player: Entity;
     private playerPosition: PositionComponent;
+    private gameScreen: GameScreen;
 
     constructor(canvasId: string) {
         this.running = false;
-
-        // TODO - use a factory to generate the map (or at least to populate it), so we can have different algos
-        this.map = new DungeonMap(40, 20);
 
         this.canvas = document.getElementById(canvasId) as HTMLCanvasElement;
         this.ctx = this.canvas.getContext("2d");
 
         this.entityManager = new EntityManager();
-        this.playerPosition = new PositionComponent(this.map.start.x, this.map.start.y);
 
         this.ctx.font = "15px serif";
     }
@@ -44,14 +41,17 @@ export class Game {
                 const spriteSheet = new SpriteSheet(this.ctx, data, image);
 
                 this.screenManager = new ScreenManager();
-                const gameScreen = new GameScreen(this.entityManager, this.map, spriteSheet);
-                this.screenManager.push(gameScreen);
+                this.gameScreen = new GameScreen(this.entityManager, spriteSheet, this.playerPosition);
+                this.screenManager.push(this.gameScreen);
 
                 this.resizeCanvas();
 
+                this.playerPosition = new PositionComponent(0, 0);  // will be adjusted when map is created
                 this.player = this.entityManager.createEntity()
                                 .addComponent(this.playerPosition)
                                 .addComponent(new RenderableComponent(spriteSheet.getSpriteByName("sigmund")));
+
+                this.createMap();
 
                 window.addEventListener("resize", this.resizeCanvas);
                 window.addEventListener("keydown", this.handleInput);
@@ -60,6 +60,18 @@ export class Game {
             });
         });
 
+    }
+
+    private createMap(width: number = 40, height: number = 20): void {
+
+        // TODO - use a factory class to generate the map, so we can have different algos
+        this.map = new DungeonMap(width, height);
+
+        // TODO - playerPosition should be a Point
+        this.playerPosition.x = this.map.start.x;
+        this.playerPosition.y = this.map.start.y;
+
+        this.gameScreen.setMap(this.map);
     }
 
     private loadImage(filename: string, callback: (image: HTMLImageElement) => void) {
@@ -108,9 +120,20 @@ export class Game {
 
     private handleInput = (event) => {
         switch (event.keyCode) {
+            case 49:    // 1 - generate small map
+                this.createMap(36, 18);
+                break;
+            case 50:    // 2 - generate medium map
+                this.createMap(50, 25);
+                break;
+            case 51:    // 2 - generate large map
+                this.createMap(100, 50);
+                break;
+
             case 68:    // d - for now, toggle debug
                 this.screenManager.debug = !this.screenManager.debug;
                 break;
+
             case 72:    // h - move left
                 this.movePlayerTo(this.playerPosition.x - 1, this.playerPosition.y);
                 break;
@@ -123,6 +146,10 @@ export class Game {
             case 76:    // l - move right
                 this.movePlayerTo(this.playerPosition.x + 1, this.playerPosition.y);
                 break;
+
+            // default:
+            //     console.log("-> unhandled key, keycode=%d", event.keyCode);
+            //     break;
         }
     }
 

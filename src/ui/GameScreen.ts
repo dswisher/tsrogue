@@ -1,6 +1,7 @@
 
 import { DungeonMap } from "../DungeonMap";
 import { EntityManager } from "../ecs/EntityManager";
+import { PositionComponent } from "../ecs/PositionComponent";
 import { SpriteSheet } from "../ui/SpriteSheet";
 import { MapWidget } from "./MapWidget";
 import { Screen } from "./Screen";
@@ -8,9 +9,14 @@ import { Screen } from "./Screen";
 export class GameScreen extends Screen {
     private mapWidget: MapWidget;
 
-    constructor(entityManager: EntityManager, map: DungeonMap, spriteSheet: SpriteSheet) {
+    constructor(entityManager: EntityManager, spriteSheet: SpriteSheet, playerPosition: PositionComponent) {
         super();
 
-        this.addWidget(new MapWidget(entityManager, map, spriteSheet));
+        this.mapWidget = new MapWidget(entityManager, spriteSheet, playerPosition);
+        this.addWidget(this.mapWidget);
+    }
+
+    public setMap(map: DungeonMap): void {
+        this.mapWidget.setMap(map);
     }
 }
