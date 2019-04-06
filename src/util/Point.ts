@@ -12,7 +12,15 @@ export class Point {
         return this._x;
     }
 
+    set x(val: number) {
+        this._x = val;
+    }
+
     get y() {
         return this._y;
+    }
+
+    set y(val: number) {
+        this._y = val;
     }
 }

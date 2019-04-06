@@ -40,13 +40,13 @@ export class Game {
 
                 const spriteSheet = new SpriteSheet(this.ctx, data, image);
 
+                this.playerPosition = new PositionComponent(0, 0);  // will be adjusted when map is created
                 this.screenManager = new ScreenManager();
                 this.gameScreen = new GameScreen(this.entityManager, spriteSheet, this.playerPosition);
                 this.screenManager.push(this.gameScreen);
 
                 this.resizeCanvas();
 
-                this.playerPosition = new PositionComponent(0, 0);  // will be adjusted when map is created
                 this.player = this.entityManager.createEntity()
                                 .addComponent(this.playerPosition)
                                 .addComponent(new RenderableComponent(spriteSheet.getSpriteByName("sigmund")));
@@ -126,7 +126,7 @@ export class Game {
             case 50:    // 2 - generate medium map
                 this.createMap(50, 25);
                 break;
-            case 51:    // 2 - generate large map
+            case 51:    // 3 - generate large map
                 this.createMap(100, 50);
                 break;
 
