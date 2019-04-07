@@ -59,7 +59,6 @@ module.exports = {
             { from: './index.html' },
             { from: './assets/rltiles-2d.json' },
             { from: './assets/rltiles-2d.png' },
-            { from: './assets/human.png' },
             { from: './assets/favicon.ico' }
         ])
     ]

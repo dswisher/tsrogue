@@ -3,6 +3,8 @@ import { DungeonMap } from "../DungeonMap";
 import { EntityManager } from "../ecs/EntityManager";
 import { PositionComponent } from "../ecs/PositionComponent";
 import { RenderableComponent } from "../ecs/RenderableComponent";
+import { FOV } from "../fov/FOV";
+import { RecursiveShadowcasting } from "../fov/RecursiveShadowcasting";
 import { Sprite } from "../ui/Sprite";
 import { SpriteSheet } from "../ui/SpriteSheet";
 import { Point } from "../util/Point";
@@ -13,17 +15,21 @@ export class MapWidget extends Widget {
     private entityManager: EntityManager;
     private map: DungeonMap;
     private wall: Sprite;
+    private floor: Sprite;
     private playerPosition: PositionComponent;
     private pixelBounds: Rect;
     private gridSize: Point;
     private halfGrid: Point;
     private scrollSize: Point;
+    private fov: FOV;
 
     constructor(entityManager: EntityManager, spriteSheet: SpriteSheet, playerPosition: PositionComponent) {
         super();
 
         this.entityManager = entityManager;
         this.wall = spriteSheet.getSpriteByName("dngn_rock_wall_08");
+        this.floor = spriteSheet.getSpriteByName("corridor");
+        this.fov = new RecursiveShadowcasting((x, y) => !this.map.getTile(x, y).blocksMovement);
 
         // TODO - get rid of all the hard-coded "32s" in this code
 
@@ -55,6 +61,8 @@ export class MapWidget extends Widget {
             return;
         }
 
+        // TODO - show explored areas that are not currently visible
+
         if (this.map) {
             // TODO - rather than calculating visibility on every frame, do it when player/mob position changes
             this.calcPlayerFOV();
@@ -65,10 +73,14 @@ export class MapWidget extends Widget {
                     const gy = sy + this.scrollSize.y;
                     const tile = this.map.getTile(gx, gy);
 
-                    if (tile.blocksMovement && tile.isVisible) {
+                    if (tile.isVisible) {
                         const p = this.gridToPixel(new Point(gx, gy));
 
-                        this.wall.draw(p.x, p.y);
+                        if (tile.blocksMovement) {
+                            this.wall.draw(p.x, p.y);
+                        } else {
+                            this.floor.draw(p.x, p.y);
+                        }
                     }
                 }
             }
@@ -148,23 +160,8 @@ export class MapWidget extends Widget {
             }
         }
 
-        // TODO - this is just a quick hack
         const radius = 10;
-        const rsquared = radius * radius;
-
-        for (let x: number = -radius; x < radius; x++) {
-            for (let y: number = -radius; y < radius; y++) {
-                if (x * x + y * y > rsquared) {
-                    continue;
-                }
-
-                const px = x + this.playerPosition.x;
-                const py = y + this.playerPosition.y;
-
-                if ((px >= 0) && (py >= 0) && (px < this.map.width) && (py < this.map.height)) {
-                    this.map.getTile(px, py).isVisible = true;
-                }
-            }
-        }
+        this.fov.compute(this.playerPosition.x, this.playerPosition.y, radius,
+                         (x, y, r, v) => { this.map.getTile(x, y).isVisible = true; });
     }
 }

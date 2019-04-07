@@ -110,7 +110,10 @@ export class Game {
         this.screenManager.setBounds(bounds);
     }
 
-    private movePlayerTo(x: number, y: number) {
+    private movePlayerTo(dx: number, dy: number) {
+        const x = this.playerPosition.x + dx;
+        const y = this.playerPosition.y + dy;
+
         const tile = this.map.getTile(x, y);
         if (!tile.blocksMovement) {
             this.playerPosition.x = x;
@@ -134,17 +137,29 @@ export class Game {
                 this.screenManager.debug = !this.screenManager.debug;
                 break;
 
+            case 66:    // b - move down and left
+                this.movePlayerTo(-1, 1);
+                break;
             case 72:    // h - move left
-                this.movePlayerTo(this.playerPosition.x - 1, this.playerPosition.y);
+                this.movePlayerTo(-1, 0);
                 break;
             case 74:    // j - move down
-                this.movePlayerTo(this.playerPosition.x, this.playerPosition.y + 1);
+                this.movePlayerTo(0, 1);
                 break;
             case 75:    // k - move up
-                this.movePlayerTo(this.playerPosition.x, this.playerPosition.y - 1);
+                this.movePlayerTo(0, -1);
                 break;
             case 76:    // l - move right
-                this.movePlayerTo(this.playerPosition.x + 1, this.playerPosition.y);
+                this.movePlayerTo(1, 0);
+                break;
+            case 78:    // n - move down and right
+                this.movePlayerTo(1, 1);
+                break;
+            case 85:    // u - move up and right
+                this.movePlayerTo(1, -1);
+                break;
+            case 89:    // y - move up and left
+                this.movePlayerTo(-1, -1);
                 break;
 
             // default:

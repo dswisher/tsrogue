@@ -12,7 +12,7 @@ all: $(DIST)
 $(DIST): $(TS_SRC) $(DEPS) index.html
 	$(WEBPACK) -p
 
-serve: $(DIST)
+serve: clean $(DIST)
 	$(WEBPACK_DEV)
 
 clean:
