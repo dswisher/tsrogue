@@ -16,6 +16,9 @@ export class MapWidget extends Widget {
     private map: DungeonMap;
     private wall: Sprite;
     private floor: Sprite;
+    private darkWall: Sprite;
+    private darkFloor: Sprite;
+
     private playerPosition: PositionComponent;
     private pixelBounds: Rect;
     private gridSize: Point;
@@ -28,7 +31,11 @@ export class MapWidget extends Widget {
 
         this.entityManager = entityManager;
         this.wall = spriteSheet.getSpriteByName("dngn_rock_wall_08");
-        this.floor = spriteSheet.getSpriteByName("corridor");
+        this.floor = spriteSheet.getSpriteByName("lit_corridor");
+
+        this.darkWall = spriteSheet.getSpriteByName("dngn_rock_wall_00");
+        this.darkFloor = spriteSheet.getSpriteByName("corridor");
+
         this.fov = new RecursiveShadowcasting((x, y) => !this.map.getTile(x, y).blocksMovement);
 
         // TODO - get rid of all the hard-coded "32s" in this code
@@ -72,14 +79,19 @@ export class MapWidget extends Widget {
                 for (let sy: number = 0; sy < this.gridSize.y; sy++) {
                     const gy = sy + this.scrollSize.y;
                     const tile = this.map.getTile(gx, gy);
+                    const p = this.gridToPixel(new Point(gx, gy));
 
                     if (tile.isVisible) {
-                        const p = this.gridToPixel(new Point(gx, gy));
-
                         if (tile.blocksMovement) {
                             this.wall.draw(p.x, p.y);
                         } else {
                             this.floor.draw(p.x, p.y);
+                        }
+                    } else if (tile.explored) {
+                        if (tile.blocksMovement) {
+                            this.darkWall.draw(p.x, p.y);
+                        } else {
+                            this.darkFloor.draw(p.x, p.y);
                         }
                     }
                 }
@@ -162,6 +174,9 @@ export class MapWidget extends Widget {
 
         const radius = 10;
         this.fov.compute(this.playerPosition.x, this.playerPosition.y, radius,
-                         (x, y, r, v) => { this.map.getTile(x, y).isVisible = true; });
+                         (x, y, r, v) => {
+                             this.map.getTile(x, y).isVisible = true;
+                             this.map.getTile(x, y).explored = true;
+                         });
     }
 }

@@ -3,6 +3,7 @@ export class MapTile {
     private _blocksMovement: boolean;
     private _blocksSight: boolean;
     private _isVisible: boolean;
+    private _explored: boolean;
 
     constructor(blocksMovement: boolean, blocksSight: boolean = null) {
 
@@ -41,5 +42,13 @@ export class MapTile {
 
     set isVisible(val: boolean) {
         this._isVisible = val;
+    }
+
+    get explored() {
+        return this._explored;
+    }
+
+    set explored(val: boolean) {
+        this._explored = val;
     }
 }
