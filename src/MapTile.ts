@@ -2,6 +2,7 @@
 export class MapTile {
     private _blocksMovement: boolean;
     private _blocksSight: boolean;
+    private _isVisible: boolean;
 
     constructor(blocksMovement: boolean, blocksSight: boolean = null) {
 
@@ -32,5 +33,13 @@ export class MapTile {
 
     set blocksSight(val: boolean) {
         this._blocksSight = val;
+    }
+
+    get isVisible() {
+        return this._isVisible;
+    }
+
+    set isVisible(val: boolean) {
+        this._isVisible = val;
     }
 }

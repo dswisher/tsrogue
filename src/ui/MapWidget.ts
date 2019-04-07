@@ -48,24 +48,26 @@ export class MapWidget extends Widget {
             return;
         }
 
+        // TODO - rather than calculating scroll bounds on every frame, do it when player position changes
         this.calcScroll();
 
         if (!this.scrollSize) {
             return;
         }
 
-        // TODO - rather than calculating bounds on every frame, do it when player position changes
-
-        // TODO - if a cell is outside the visible bounds, don't draw it
-
         if (this.map) {
-            for (let x: number = 0; x < this.map.width; x++) {
-                for (let y: number = 0; y < this.map.height; y++) {
-                    const tile = this.map.getTile(x, y);
-                    if (tile.blocksMovement) {
-                        const p = this.gridToPixel(new Point(x, y));
+            // TODO - rather than calculating visibility on every frame, do it when player/mob position changes
+            this.calcPlayerFOV();
 
-                        // TODO - have draw take a Point
+            for (let sx: number = 0; sx < this.gridSize.x; sx++) {
+                const gx = sx + this.scrollSize.x;
+                for (let sy: number = 0; sy < this.gridSize.y; sy++) {
+                    const gy = sy + this.scrollSize.y;
+                    const tile = this.map.getTile(gx, gy);
+
+                    if (tile.blocksMovement && tile.isVisible) {
+                        const p = this.gridToPixel(new Point(gx, gy));
+
                         this.wall.draw(p.x, p.y);
                     }
                 }
@@ -104,8 +106,8 @@ export class MapWidget extends Widget {
         this.pixelBounds = new Rect(left, top, width, height);
 
         // Calc grid bounds
-        this.gridSize = new Point(width / 32, height / 32);
-        this.halfGrid = new Point(this.gridSize.x / 2, this.gridSize.y / 2);
+        this.gridSize = new Point(Math.floor(width / 32), Math.floor(height / 32));
+        this.halfGrid = new Point(Math.floor(this.gridSize.x / 2), Math.floor(this.gridSize.y / 2));
     }
 
     private calcScroll(): void {
@@ -113,7 +115,7 @@ export class MapWidget extends Widget {
 
         if (this.playerPosition.x < this.halfGrid.x) {
             scroll.x = 0;
-        } else if (this.playerPosition.x > this.map.width - this.halfGrid.x) {
+        } else if (this.playerPosition.x >= this.map.width - this.halfGrid.x) {
             scroll.x = this.map.width - this.gridSize.x;
         } else {
             scroll.x = this.playerPosition.x - this.halfGrid.x;
@@ -121,7 +123,7 @@ export class MapWidget extends Widget {
 
         if (this.playerPosition.y < this.halfGrid.y) {
             scroll.y = 0;
-        } else if (this.playerPosition.y > this.map.height - this.halfGrid.y) {
+        } else if (this.playerPosition.y >= this.map.height - this.halfGrid.y) {
             scroll.y = this.map.height - this.gridSize.y;
         } else {
             scroll.y = this.playerPosition.y - this.halfGrid.y;
@@ -136,5 +138,33 @@ export class MapWidget extends Widget {
         const y = ((pos.y - this.scrollSize.y) * 32) + this.pixelBounds.top;
 
         return new Point(x, y);
+    }
+
+    private calcPlayerFOV(): void {
+        // TODO - figure out a better way to reset the FOV each time
+        for (let x: number = 0; x < this.map.width; x++) {
+            for (let y: number = 0; y < this.map.height; y++) {
+                this.map.getTile(x, y).isVisible = false;
+            }
+        }
+
+        // TODO - this is just a quick hack
+        const radius = 10;
+        const rsquared = radius * radius;
+
+        for (let x: number = -radius; x < radius; x++) {
+            for (let y: number = -radius; y < radius; y++) {
+                if (x * x + y * y > rsquared) {
+                    continue;
+                }
+
+                const px = x + this.playerPosition.x;
+                const py = y + this.playerPosition.y;
+
+                if ((px >= 0) && (py >= 0) && (px < this.map.width) && (py < this.map.height)) {
+                    this.map.getTile(px, py).isVisible = true;
+                }
+            }
+        }
     }
 }
